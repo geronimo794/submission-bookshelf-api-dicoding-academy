@@ -1,0 +1,29 @@
+{
+  "name": "submission-bookshelf-api",
+  "version": "1.0.0",
+  "description": "Backend application written in node js and hapi framework.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ./src",
+    "start": "nodemon ./src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geronimo794/submission-bookshelf-api-dicoding-academy.git"
+  },
+  "author": "Ach Rozikin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/geronimo794/submission-bookshelf-api-dicoding-academy/issues"
+  },
+  "homepage": "https://github.com/geronimo794/submission-bookshelf-api-dicoding-academy#readme",
+  "devDependencies": {
+    "eslint": "^8.28.0",
+    "eslint-config-google": "^0.14.0",
+    "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "@hapi/hapi": "^21.0.0"
+  }
+}
