@@ -1,24 +1,60 @@
 const {nanoid} = require('nanoid');
+const {book} = require('./models/book.js');
+const {books} = require('./books.js');
+const {responseFailIncompleteNameAdd,
+  responseFailReadPageMoreThanPageCountAdd,
+  // responseFailReadPageMoreThanPageCountUpdate,
+  // responseFailIncompleteNameUpdate,
+  // responseFailBookNotFound,
+  // responseFailBookNotFoundUpdate,
+  // responseFailBookNotFoundDelete,
+  // responseErrorAddBook,
+  responseSuccessAddBook,
+  // responseSuccessUpdateBook,
+  // responseSuccessGetBookList,
+  // responseSuccessGetBookDetail,
+  // responseSuccessDeleteBook
+} = require('./models/response');
 
-const addNoteHandler = (request, h) => {
-  const {title, tags, body} = request.payload;
-  const id = nanoid(16);
-  const createdAt = new Date().toISOString();
-  const updatedAt = createdAt;
-  const newNote = {
-    title, tags, body, id, createdAt, updatedAt,
-  };
-  notes.push(newNote);
-  const isSuccess = notes.filter((note) => note.id === id).length > 0;
+const addBookHandler = (request, h) => {
+  const {name, year, author, summary, publisher, pageCount,
+    readPage, reading} = request.payload;
+
+  // If name is empty
+  if (!name) {
+    const response = h.response(responseFailIncompleteNameAdd);
+    response.code(400);
+    return response;
+  }
+
+  // If readPage > pageCount
+  if (readPage > pageCount) {
+    const response = h.response(responseFailReadPageMoreThanPageCountAdd);
+    response.code(400);
+    return response;
+  }
+
+  const newBook = book;
+  newBook.id = nanoid(16);
+  newBook.name = name;
+  newBook.year = year;
+  newBook.author = author;
+  newBook.summary = summary;
+  newBook.publisher = publisher;
+  newBook.pageCount = pageCount;
+  newBook.readPage = readPage;
+  newBook.finished = (readPage == pageCount);
+  newBook.reading = (reading == 'true' ? true : false);
+  newBook.insertedAt = new Date().toISOString();
+  newBook.updatedAt = newBook.insertedAt;
+
+  books.push(newBook);
+  const isSuccess = books.filter((book) => book.id === newBook.id).length > 0;
 
   if (isSuccess) {
-    const response = h.response({
-      status: 'success',
-      message: 'Catatan berhasil ditambahkan',
-      data: {
-        noteId: id,
-      },
-    });
+    const newBookSuccess = responseSuccessAddBook;
+    newBookSuccess.data.bookId = newBook.id;
+    const response = h.response(newBookSuccess);
     response.code(201);
     return response;
   }
@@ -29,5 +65,5 @@ const addNoteHandler = (request, h) => {
   response.code(500);
   return response;
 };
-// ilove om kin
-module.exports = {addNoteHandler};
+
+module.exports = {addBookHandler};
