@@ -64,6 +64,7 @@ class BookHandler {
     response.code(500);
     return response;
   };
+
   /**
    * Request handler for get book
    *
@@ -85,6 +86,7 @@ class BookHandler {
     response.code(200);
     return response;
   };
+
   /**
    * Request handler for get book
    *
@@ -104,6 +106,60 @@ class BookHandler {
     }
 
     const newResponseNotFound = Response.responseFailBookNotFound;
+    const response = h.response(newResponseNotFound);
+    response.code(404);
+    return response;
+  };
+
+  /**
+   * Request handler for get book
+   *
+   * @param {*} request The request payload object
+   * @param {*} h The hapi object for response
+   * @return {*} The response data
+   */
+  static update = (request, h) => {
+    const {name, year, author, summary, publisher, pageCount,
+      readPage, reading} = request.payload;
+    const {bookId} = request.params;
+
+    // If name is empty
+    if (!name) {
+      const response = h.response(Response.responseFailIncompleteNameUpdate);
+      response.code(400);
+      return response;
+    }
+
+    // If readPage > pageCount
+    if (readPage > pageCount) {
+      // eslint-disable-next-line max-len
+      const response = h.response(Response.responseFailReadPageMoreThanPageCountUpdate);
+      response.code(400);
+      return response;
+    }
+
+    const index = books.findIndex((books) => books.id === bookId);
+
+    if (index !== -1) {
+      books[index].name = name;
+      books[index].year = year;
+      books[index].author = author;
+      books[index].summary = summary;
+      books[index].publisher = publisher;
+      books[index].pageCount = pageCount;
+      books[index].readPage = readPage;
+      books[index].finished = (readPage == pageCount);
+      books[index].reading = (reading == 'true' ? true : false);
+      books[index].updatedAt = new Date().toISOString();
+      const newResponseSucces = Response.responseSuccessUpdateBook;
+
+      const response = h.response(newResponseSucces);
+      response.code(200);
+      return response;
+    }
+
+    // If data not found
+    const newResponseNotFound = Response.responseFailBookNotFoundUpdate;
     const response = h.response(newResponseNotFound);
     response.code(404);
     return response;
