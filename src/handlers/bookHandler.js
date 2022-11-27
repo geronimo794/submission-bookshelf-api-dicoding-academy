@@ -112,7 +112,7 @@ class BookHandler {
   };
 
   /**
-   * Request handler for get book
+   * Request handler for update book
    *
    * @param {*} request The request payload object
    * @param {*} h The hapi object for response
@@ -160,6 +160,31 @@ class BookHandler {
 
     // If data not found
     const newResponseNotFound = Response.responseFailBookNotFoundUpdate;
+    const response = h.response(newResponseNotFound);
+    response.code(404);
+    return response;
+  };
+
+  /**
+   * Request handler for delete book
+   *
+   * @param {*} request The request payload object
+   * @param {*} h The hapi object for response
+   * @return {*} The response data
+   */
+  static delete = (request, h) => {
+    const {bookId} = request.params;
+    const index = books.findIndex((book) => book.id === bookId);
+    if (index !== -1) {
+      books.splice(index, 1);
+
+      const newResponseSucces = Response.responseSuccessDeleteBook;
+      const response = h.response(newResponseSucces);
+      response.code(200);
+      return response;
+    }
+
+    const newResponseNotFound = Response.responseFailBookNotFoundDelete;
     const response = h.response(newResponseNotFound);
     response.code(404);
     return response;
