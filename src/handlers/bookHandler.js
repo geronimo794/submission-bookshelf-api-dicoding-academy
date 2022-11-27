@@ -1,7 +1,7 @@
 const {nanoid} = require('nanoid');
-const {book} = require('./models/book.js');
-const {books} = require('./books.js');
-const {Response} = require('./models/response');
+const {book} = require('../models/book.js');
+const {books} = require('../books.js');
+const {Response} = require('../models/response');
 
 /**
  * Collection of book handler function
@@ -83,6 +83,29 @@ class BookHandler {
     newResponseBookList.data.books = newBook;
     const response = h.response(newResponseBookList);
     response.code(200);
+    return response;
+  };
+  /**
+   * Request handler for get book
+   *
+   * @param {*} request The request payload object
+   * @param {*} h The hapi object for response
+   * @return {*} The response data
+   */
+  static getDetail = (request, h) => {
+    const {bookId} = request.params;
+
+    const book = books.filter((n) => n.id === bookId)[0];
+
+    if (book !== undefined) {
+      const newResponseSucces = Response.responseSuccessGetBookDetail;
+      newResponseSucces.data.book = book;
+      return h.response(newResponseSucces);
+    }
+
+    const newResponseNotFound = Response.responseFailBookNotFound;
+    const response = h.response(newResponseNotFound);
+    response.code(404);
     return response;
   };
 }
