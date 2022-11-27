@@ -1,6 +1,6 @@
 const {nanoid} = require('nanoid');
-const {book} = require('../models/book.js');
-const {books} = require('../books.js');
+const {books} = require('../storages/books.js');
+const {Book} = require('../models/book.js');
 const {Response} = require('../models/response');
 
 /**
@@ -33,7 +33,7 @@ class BookHandler {
       return response;
     }
 
-    const newBook = book;
+    const newBook = new Book();
     newBook.id = nanoid(16);
     newBook.name = name;
     newBook.year = year;
@@ -43,7 +43,7 @@ class BookHandler {
     newBook.pageCount = pageCount;
     newBook.readPage = readPage;
     newBook.finished = (readPage == pageCount);
-    newBook.reading = (reading == 'true' ? true : false);
+    newBook.reading = reading;
     newBook.insertedAt = new Date().toISOString();
     newBook.updatedAt = newBook.insertedAt;
 
@@ -73,9 +73,41 @@ class BookHandler {
    * @return {*} The response data
    */
   static getAll = (request, h) => {
+    const {name, reading, finished} = request.query;
+
+    // Translate reading variable to boolean
+    let readingBool;
+    if (reading != undefined) {
+      if (reading == '1') readingBool = true;
+      else if (reading == '0') readingBool = false;
+    }
+
+    // Translate finished variable to boolean
+    let finishedBool;
+    if (finished != undefined) {
+      if (finished == '1') finishedBool = true;
+      else if (finished == '0') finishedBool = false;
+    }
+
+
+    const findBooks = books.filter((book) => {
+      const bookName = (book.name).toLowerCase();
+
+      // eslint-disable-next-line max-len
+      const findName = (name === undefined || bookName.includes(name.toLowerCase()));
+      // eslint-disable-next-line max-len
+      const findReading = (readingBool === undefined || book.reading === readingBool);
+      // eslint-disable-next-line max-len
+      const findFinished = (finishedBool === undefined || book.finished === finishedBool);
+
+      if (findName && findReading && findFinished) {
+        return true;
+      }
+    });
+
     // Recompose response array
     const newBook = [];
-    books.forEach((v, i) => {
+    findBooks.forEach((v, i) => {
       newBook.push({id: v.id, name: v.name, publisher: v.publisher});
     });
 
